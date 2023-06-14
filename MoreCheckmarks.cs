@@ -24,9 +24,9 @@ using Comfort.Common;
 // This calls GClass1765.smethod_3 if the interactive is a LootItem
 // This returns an instance of GClass2642 which has a list field "Actions" containing all available actions of type GClass2643
 // GClass2643.Name will be directly used as the string that will be displayed in the list, so we set it to a TMPro string with correct color and bold
-using InteractionController = GClass1765;
-using InteractionInstance = GClass2642;
-using Action = GClass2641;
+using InteractionController = GClass1767;
+using InteractionInstance = GClass2644;
+using Action = GClass2643;
 
 namespace MoreCheckmarks
 {
@@ -102,6 +102,37 @@ namespace MoreCheckmarks
             DoPatching();
         }
 
+        public static (RawQuestClass, ConditionItem) GetQuestCondition(Profile profile, Item item)
+        {
+            RawQuestClass rawQuestClass = null;
+            
+            ConditionItem conditionItem = null;
+            
+            foreach (QuestDataClass questDataClass in profile.QuestsData)
+            {
+                if (questDataClass.Status == EQuestStatus.Started && questDataClass.Template != null)
+                {
+                    foreach (KeyValuePair<EQuestStatus, GClass2916> kvp in questDataClass.Template.Conditions)
+                    {
+                        EQuestStatus equestStatus;
+                        GClass2916 gclass;
+                        kvp.Deconstruct(out equestStatus, out gclass);
+                        foreach (Condition condition in gclass)
+                        {
+                            ConditionItem conditionItem2;
+                            if (!questDataClass.CompletedConditions.Contains(condition.id) && (conditionItem2 = (condition as ConditionItem)) != null && conditionItem2.target.Contains(item.TemplateId))
+                            {
+                                rawQuestClass = questDataClass.Template;
+                                conditionItem = conditionItem2;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            return (rawQuestClass, conditionItem);
+        }
+        
         public void LoadData()
         {
             LogInfo("Loading data");
@@ -126,7 +157,8 @@ namespace MoreCheckmarks
                             {
                                 if (!quests.questData.ContainsKey(questData[i]["_id"].ToString()))
                                 {
-                                    quests.questData.Add(questData[i]["_id"].ToString(), questData[i]["QuestName"].ToString());
+                                    quests.questData.Add(questData[i]["_id"].ToString(), questData[i]["name"].ToString());
+                                    // TODO: Add count to questData
                                 }
                                 int.TryParse(availableForFinishConditions[j]["_props"]["value"].ToString(), out int parsedValue);
                                 quests.count += parsedValue;
@@ -134,7 +166,7 @@ namespace MoreCheckmarks
                             else
                             {
                                 QuestPair newPair = new QuestPair();
-                                newPair.questData.Add(questData[i]["_id"].ToString(), questData[i]["QuestName"].ToString());
+                                newPair.questData.Add(questData[i]["_id"].ToString(), questData[i]["name"].ToString());
                                 int.TryParse(availableForFinishConditions[j]["_props"]["value"].ToString(), out int parsedValue);
                                 newPair.count = parsedValue;
                                 questDataCompleteByItemTemplateID.Add(targets[k].ToString(), newPair);
@@ -191,7 +223,7 @@ namespace MoreCheckmarks
                             {
                                 if (!quests.questData.ContainsKey(questData[i]["_id"].ToString()))
                                 {
-                                    quests.questData.Add(questData[i]["_id"].ToString(), questData[i]["QuestName"].ToString());
+                                    quests.questData.Add(questData[i]["_id"].ToString(), questData[i]["name"].ToString());
                                 }
                                 int.TryParse(availableForFinishConditions[j]["_props"]["value"].ToString(), out int parsedValue);
                                 quests.count += parsedValue;
@@ -199,7 +231,7 @@ namespace MoreCheckmarks
                             else
                             {
                                 QuestPair newPair = new QuestPair();
-                                newPair.questData.Add(questData[i]["_id"].ToString(), questData[i]["QuestName"].ToString());
+                                newPair.questData.Add(questData[i]["_id"].ToString(), questData[i]["name"].ToString());
                                 int.TryParse(availableForFinishConditions[j]["_props"]["value"].ToString(), out int parsedValue);
                                 newPair.count = parsedValue;
                                 questDataCompleteByItemTemplateID.Add(targets[k].ToString(), newPair);
@@ -233,7 +265,7 @@ namespace MoreCheckmarks
                             {
                                 if (!quests.questData.ContainsKey(questData[i]["_id"].ToString()))
                                 {
-                                    quests.questData.Add(questData[i]["_id"].ToString(), questData[i]["QuestName"].ToString());
+                                    quests.questData.Add(questData[i]["_id"].ToString(), questData[i]["name"].ToString());
                                 }
                                 int.TryParse(availableForFinishConditions[j]["_props"]["value"].ToString(), out int parsedValue);
                                 quests.count += parsedValue;
@@ -241,7 +273,7 @@ namespace MoreCheckmarks
                             else
                             {
                                 QuestPair newPair = new QuestPair();
-                                newPair.questData.Add(questData[i]["_id"].ToString(), questData[i]["QuestName"].ToString());
+                                newPair.questData.Add(questData[i]["_id"].ToString(), questData[i]["name"].ToString());
                                 int.TryParse(availableForFinishConditions[j]["_props"]["value"].ToString(), out int parsedValue);
                                 newPair.count = parsedValue;
                                 questDataCompleteByItemTemplateID.Add(targets[k].ToString(), newPair);
@@ -275,7 +307,7 @@ namespace MoreCheckmarks
                             {
                                 if (!quests.questData.ContainsKey(questData[i]["_id"].ToString()))
                                 {
-                                    quests.questData.Add(questData[i]["_id"].ToString(), questData[i]["QuestName"].ToString());
+                                    quests.questData.Add(questData[i]["_id"].ToString(), questData[i]["name"].ToString());
                                 }
                                 int.TryParse(availableForFinishConditions[j]["_props"]["value"].ToString(), out int parsedValue);
                                 quests.count += parsedValue;
@@ -283,7 +315,7 @@ namespace MoreCheckmarks
                             else
                             {
                                 QuestPair newPair = new QuestPair();
-                                newPair.questData.Add(questData[i]["_id"].ToString(), questData[i]["QuestName"].ToString());
+                                newPair.questData.Add(questData[i]["_id"].ToString(), questData[i]["name"].ToString());
                                 int.TryParse(availableForFinishConditions[j]["_props"]["value"].ToString(), out int parsedValue);
                                 newPair.count = parsedValue;
                                 questDataCompleteByItemTemplateID.Add(targets[k].ToString(), newPair);
@@ -321,7 +353,7 @@ namespace MoreCheckmarks
                             {
                                 if (!quests.questData.ContainsKey(questData[i]["_id"].ToString()))
                                 {
-                                    quests.questData.Add(questData[i]["_id"].ToString(), questData[i]["QuestName"].ToString());
+                                    quests.questData.Add(questData[i]["_id"].ToString(), questData[i]["name"].ToString());
                                 }
                                 int.TryParse(availableForStartConditions[j]["_props"]["value"].ToString(), out int parsedValue);
                                 quests.count += parsedValue;
@@ -329,7 +361,7 @@ namespace MoreCheckmarks
                             else
                             {
                                 QuestPair newPair = new QuestPair();
-                                newPair.questData.Add(questData[i]["_id"].ToString(), questData[i]["QuestName"].ToString());
+                                newPair.questData.Add(questData[i]["_id"].ToString(), questData[i]["name"].ToString());
                                 int.TryParse(availableForStartConditions[j]["_props"]["value"].ToString(), out int parsedValue);
                                 newPair.count = parsedValue;
                                 questDataStartByItemTemplateID.Add(targets[k].ToString(), newPair);
@@ -386,7 +418,7 @@ namespace MoreCheckmarks
                             {
                                 if (!quests.questData.ContainsKey(questData[i]["_id"].ToString()))
                                 {
-                                    quests.questData.Add(questData[i]["_id"].ToString(), questData[i]["QuestName"].ToString());
+                                    quests.questData.Add(questData[i]["_id"].ToString(), questData[i]["name"].ToString());
                                 }
                                 int.TryParse(availableForStartConditions[j]["_props"]["value"].ToString(), out int parsedValue);
                                 quests.count += parsedValue;
@@ -394,7 +426,7 @@ namespace MoreCheckmarks
                             else
                             {
                                 QuestPair newPair = new QuestPair();
-                                newPair.questData.Add(questData[i]["_id"].ToString(), questData[i]["QuestName"].ToString());
+                                newPair.questData.Add(questData[i]["_id"].ToString(), questData[i]["name"].ToString());
                                 int.TryParse(availableForStartConditions[j]["_props"]["value"].ToString(), out int parsedValue);
                                 newPair.count = parsedValue;
                                 questDataStartByItemTemplateID.Add(targets[k].ToString(), newPair);
@@ -428,7 +460,7 @@ namespace MoreCheckmarks
                             {
                                 if (!quests.questData.ContainsKey(questData[i]["_id"].ToString()))
                                 {
-                                    quests.questData.Add(questData[i]["_id"].ToString(), questData[i]["QuestName"].ToString());
+                                    quests.questData.Add(questData[i]["_id"].ToString(), questData[i]["name"].ToString());
                                 }
                                 int.TryParse(availableForStartConditions[j]["_props"]["value"].ToString(), out int parsedValue);
                                 quests.count += parsedValue;
@@ -436,7 +468,7 @@ namespace MoreCheckmarks
                             else
                             {
                                 QuestPair newPair = new QuestPair();
-                                newPair.questData.Add(questData[i]["_id"].ToString(), questData[i]["QuestName"].ToString());
+                                newPair.questData.Add(questData[i]["_id"].ToString(), questData[i]["name"].ToString());
                                 int.TryParse(availableForStartConditions[j]["_props"]["value"].ToString(), out int parsedValue);
                                 newPair.count = parsedValue;
                                 questDataStartByItemTemplateID.Add(targets[k].ToString(), newPair);
@@ -470,7 +502,7 @@ namespace MoreCheckmarks
                             {
                                 if (!quests.questData.ContainsKey(questData[i]["_id"].ToString()))
                                 {
-                                    quests.questData.Add(questData[i]["_id"].ToString(), questData[i]["QuestName"].ToString());
+                                    quests.questData.Add(questData[i]["_id"].ToString(), questData[i]["name"].ToString());
                                 }
                                 int.TryParse(availableForStartConditions[j]["_props"]["value"].ToString(), out int parsedValue);
                                 quests.count += parsedValue;
@@ -478,7 +510,7 @@ namespace MoreCheckmarks
                             else
                             {
                                 QuestPair newPair = new QuestPair();
-                                newPair.questData.Add(questData[i]["_id"].ToString(), questData[i]["QuestName"].ToString());
+                                newPair.questData.Add(questData[i]["_id"].ToString(), questData[i]["name"].ToString());
                                 int.TryParse(availableForStartConditions[j]["_props"]["value"].ToString(), out int parsedValue);
                                 newPair.count = parsedValue;
                                 questDataStartByItemTemplateID.Add(targets[k].ToString(), newPair);
@@ -505,7 +537,7 @@ namespace MoreCheckmarks
                 }
             }
 
-            LogInfo("\tAssorts");
+            /*LogInfo("\tAssorts");
             string euro = "569668774bdc2da2298b4568";
             string rouble = "5449016a4bdc2d6f028b456f";
             string dollar = "5696686a4bdc2da3298b456a";
@@ -533,7 +565,7 @@ namespace MoreCheckmarks
                         }
                     }
                 }
-            }
+            }*/
         }
 
         private bool StringJArrayContainsString(JArray arr, string s)
@@ -850,6 +882,13 @@ namespace MoreCheckmarks
                 MoreCheckmarksMod.questDataStartByItemTemplateID.TryGetValue(item.TemplateId, out MoreCheckmarksMod.QuestPair startQuests);
                 MoreCheckmarksMod.questDataCompleteByItemTemplateID.TryGetValue(item.TemplateId, out MoreCheckmarksMod.QuestPair completeQuests);
                 bool questItem = item.MarkedAsSpawnedInSession && (item.QuestItem || MoreCheckmarksMod.includeFutureQuests ? (startQuests != null && startQuests.questData.Count > 0) || (completeQuests != null && completeQuests.questData.Count > 0) : (___string_5 != null && ___string_5.Contains("quest")));
+
+                if (!MoreCheckmarksMod.includeFutureQuests && item.MarkedAsSpawnedInSession && !questItem)
+                {
+                    (RawQuestClass? rawQuestClass, ConditionItem? conditionItem) = MoreCheckmarksMod.GetQuestCondition(profile, item);
+                    questItem = rawQuestClass != null;
+                }
+                
                 bool wishlist = ItemUiContext.Instance.IsInWishList(item.TemplateId);
 
                 // Setup label for inspect view
@@ -858,7 +897,7 @@ namespace MoreCheckmarks
                     // Since being quest item could be set by future quests, need to make sure we have "QUEST ITEM" label
                     if (questItem)
                     {
-                        ____questItemLabel.text = "QUEST ITEM";
+                        ____questItemLabel.text = "ПРЕДМЕТ ДЛЯ ЗАДАНИЯ";
                     }
                     ____questItemLabel.gameObject.SetActive(questItem);
                 }
@@ -1170,7 +1209,7 @@ namespace MoreCheckmarks
                                     questStartString += ", ";
                                     if (index == count - 2)
                                     {
-                                        questStartString += "</color>and <color=#dd831a>";
+                                        questStartString += "</color>и <color=#dd831a>";
                                     }
                                 }
                                 else
@@ -1184,7 +1223,8 @@ namespace MoreCheckmarks
                         if (gotStartQuests)
                         {
                             gotQuest = true;
-                            ___string_5 = "Item will be/is needed to start quest" + (gotMoreThanOneStartQuest ? "s" : "") + " " + questStartString + " (" + possessedQuestCount + "/" + totalItemCount + ")";
+                            // ___string_5 = "Item will be/is needed to start quest" + (gotMoreThanOneStartQuest ? "s" : "") + " " + questStartString + " (" + possessedQuestCount + "/" + totalItemCount + ")";
+                            ___string_5 = "Предмет будет/уже нужен для начала квест" + (gotMoreThanOneStartQuest ? "ов" : "а") + " " + questStartString + " (" + possessedQuestCount + "/" + totalItemCount + ")";
                         }
                         string questCompleteString = "<color=#dd831a>";
                         bool gotCompleteQuests = false;
@@ -1204,13 +1244,13 @@ namespace MoreCheckmarks
                             int index = 0;
                             foreach (KeyValuePair<string, string> questEntry in completeQuests.questData)
                             {
-                                questCompleteString += questEntry.Value;
+                                questCompleteString += questEntry.Value.Localized(null);
                                 if (index != count - 1)
                                 {
                                     questCompleteString += ", ";
                                     if (index == count - 2)
                                     {
-                                        questCompleteString += "</color>and <color=#dd831a>";
+                                        questCompleteString += "</color>и <color=#dd831a>";
                                     }
                                 }
                                 else
@@ -1225,60 +1265,42 @@ namespace MoreCheckmarks
                         {
                             if (gotStartQuests)
                             {
-                                ___string_5 += ", and will be/is needed to complete quest" + (gotMoreThanOneCompleteQuest ? "s" : "") + " " + questCompleteString + " (" + possessedQuestCount + "/" + totalItemCount + ")";
+                                // ___string_5 += ", and will be/is needed to complete quest" + (gotMoreThanOneCompleteQuest ? "s" : "") + " " + questCompleteString + " (" + possessedQuestCount + "/" + totalItemCount + ")";
+                                ___string_5 += ", и будет/уже нужен для завершения " + (gotMoreThanOneCompleteQuest ? "квестов" : "квеста") + " " + questCompleteString + " (" + possessedQuestCount + "/" + totalItemCount + ")";
                             }
                             else
                             {
                                 gotQuest = true;
-                                ___string_5 = "Item will be/is needed to complete quest" + (gotMoreThanOneCompleteQuest ? "s" : "") + " " + questCompleteString + " (" + possessedQuestCount + "/" + totalItemCount + ")";
+                                // ___string_5 = "Item will be/is needed to complete quest" + (gotMoreThanOneCompleteQuest ? "s" : "") + " " + questCompleteString + " (" + possessedQuestCount + "/" + totalItemCount + ")";
+                                ___string_5 = "Предмет будет/уже нужен для завершения " + (gotMoreThanOneCompleteQuest ? "квестов" : "квеста") + " " + questCompleteString + " (" + possessedQuestCount + "/" + totalItemCount + ")";
                             }
                         }
                     }
                     else // Don't include future quests, do as vanilla
                     {
-                        RawQuestClass rawQuestClass = null;
-                        ConditionItem conditionItem = null;
-                        foreach (QuestDataClass questDataClass in profile.QuestsData)
-                        {
-                            if (questDataClass.Status == EQuestStatus.Started && questDataClass.Template != null)
-                            {
-                                foreach (KeyValuePair<EQuestStatus, GClass2914> kvp in questDataClass.Template.Conditions)
-                                {
-                                    EQuestStatus equestStatus;
-                                    GClass2914 gclass;
-                                    kvp.Deconstruct(out equestStatus, out gclass);
-                                    foreach (Condition condition in gclass)
-                                    {
-                                        ConditionItem conditionItem2;
-                                        if (!questDataClass.CompletedConditions.Contains(condition.id) && (conditionItem2 = (condition as ConditionItem)) != null && conditionItem2.target.Contains(item.TemplateId))
-                                        {
-                                            rawQuestClass = questDataClass.Template;
-                                            conditionItem = conditionItem2;
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        (RawQuestClass? rawQuestClass, ConditionItem? conditionItem) = MoreCheckmarksMod.GetQuestCondition(profile, item);
                         if (rawQuestClass != null)
                         {
                             string arg = "<color=#dd831a>" + rawQuestClass.Name + "</color>";
                             if (item.QuestItem)
                             {
                                 gotQuest = true;
-                                ___string_5 = string.Format("Item is related to an active {0} quest".Localized(null), arg);
+                                // ___string_5 = string.Format("Item is related to an active {0} quest".Localized(null), arg);
+                                ___string_5 = string.Format("Предмет связан с активным квестом {0}".Localized(null), arg);
                             }
                             Weapon weapon;
                             ConditionWeaponAssembly condition;
                             if (!gotQuest && (weapon = (item as Weapon)) != null && (condition = (conditionItem as ConditionWeaponAssembly)) != null && InventoryClass.IsWeaponFitsCondition(weapon, condition, false))
                             {
                                 gotQuest = true;
-                                ___string_5 = string.Format("Item fits the active {0} quest requirements".Localized(null), arg);
+                                // ___string_5 = string.Format("Item fits the active {0} quest requirements".Localized(null), arg);
+                                ___string_5 = string.Format("Предмет соответствует требованиям активного квеста {0}".Localized(null), arg);
                             }
                             if (!gotQuest && item.MarkedAsSpawnedInSession)
                             {
                                 gotQuest = true;
-                                ___string_5 = string.Format("Item that has been found in raid for the {0} quest".Localized(null), arg);
+                                // ___string_5 = string.Format("Item that has been found in raid for the {0} quest".Localized(null), arg);
+                                ___string_5 = string.Format("Предмет, который был найден в рейде для квеста {0}".Localized(null), arg);
                             }
                         }
                     }
@@ -1289,17 +1311,19 @@ namespace MoreCheckmarks
                 string areaNamesString = "";
                 for (int i = 0; i < areaNames.Count; ++i)
                 {
-                    areaNamesString += (i == 0 ? "" : (areaNames.Count == 2 ? "" : ",") + (i == areaNames.Count - 1 ? " and " : " ")) + areaNames[i];
+                    areaNamesString += (i == 0 ? "" : (areaNames.Count == 2 ? "" : ",") + (i == areaNames.Count - 1 ? " и " : " ")) + areaNames[i];
                 }
                 if (!areaNamesString.Equals(""))
                 {
                     if (gotQuest)
                     {
-                        ___string_5 += string.Format(", and needed for {0} ({1}/{2})".Localized(), areaNamesString, possessedCount, requiredCount);
+                        // ___string_5 += string.Format(", and needed for {0} ({1}/{2})".Localized(null), areaNamesString, possessedCount, requiredCount);
+                        ___string_5 += string.Format(", и нужен для {0} ({1}/{2})".Localized(null), areaNamesString, possessedCount, requiredCount);
                     }
                     else
                     {
-                        ___string_5 = string.Format("Needed for {0} ({1}/{2})".Localized(), areaNamesString, possessedCount, requiredCount);
+                        // ___string_5 = string.Format("Needed for {0} ({1}/{2})".Localized(null), areaNamesString, possessedCount, requiredCount);
+                        ___string_5 = string.Format("Нужен для {0} ({1}/{2})".Localized(null), areaNamesString, possessedCount, requiredCount);
                     }
                 }
 
@@ -1308,18 +1332,21 @@ namespace MoreCheckmarks
                 {
                     if (gotQuest || gotAreas)
                     {
-                        ___string_5 += string.Format(", and on {0}".Localized(), "<color=#" + ColorUtility.ToHtmlStringRGB(MoreCheckmarksMod.wishlistColor) + ">Wish List</color>");
+                        // ___string_5 += string.Format(", and on {0}".Localized(null), "<color=#" + ColorUtility.ToHtmlStringRGB(MoreCheckmarksMod.wishlistColor) + ">Wish List</color>");
+                        ___string_5 += string.Format(", и в {0}".Localized(null), "<color=#" + ColorUtility.ToHtmlStringRGB(MoreCheckmarksMod.wishlistColor) + ">Списке Желаний</color>");
                     }
                     else
                     {
-                        ___string_5 = string.Format("On {0}".Localized(), "<color=#" + ColorUtility.ToHtmlStringRGB(MoreCheckmarksMod.wishlistColor) + ">Wish List</color>");
+                        // ___string_5 = string.Format("On {0}".Localized(null), "<color=#" + ColorUtility.ToHtmlStringRGB(MoreCheckmarksMod.wishlistColor) + ">Wish List</color>");
+                        ___string_5 = string.Format("В {0}".Localized(null), "<color=#" + ColorUtility.ToHtmlStringRGB(MoreCheckmarksMod.wishlistColor) + ">Списке Желаний</color>");
                     }
                 }
 
                 // Show found in raid if found in raid and not required for anything else
                 if (!gotQuest && !gotAreas && !wishlist && item.MarkedAsSpawnedInSession)
                 {
-                    ___string_5 = "Item found in raid".Localized(null);
+                    // ___string_5 = "Item found in raid".Localized(null);
+                    ___string_5 = "Предмет найден в рейде".Localized(null);
                 }
 
                 if (gotQuest || gotAreas || wishlist || item.MarkedAsSpawnedInSession)
@@ -1391,11 +1418,11 @@ namespace MoreCheckmarks
                             {
                                 if (questItem && MoreCheckmarksMod.questPriority > MoreCheckmarksMod.wishlistPriority)
                                 {
-                                    action.Name = "<font=\"BenderBold\"><color=#FFE433>Take</color></font>";
+                                    action.Name = "<font=\"BenderBold\"><color=#FFE433>Взять</color></font>";
                                 }
                                 else
                                 {
-                                    action.Name = "<font=\"BenderBold\"><color=#" + ColorUtility.ToHtmlStringRGB(MoreCheckmarksMod.wishlistColor) + ">Take</color></font>";
+                                    action.Name = "<font=\"BenderBold\"><color=#" + ColorUtility.ToHtmlStringRGB(MoreCheckmarksMod.wishlistColor) + ">Взять</color></font>";
                                 }
 
                             }
@@ -1403,11 +1430,11 @@ namespace MoreCheckmarks
                             {
                                 if (questItem && MoreCheckmarksMod.questPriority > MoreCheckmarksMod.hideoutPriority)
                                 {
-                                    action.Name = "<font=\"BenderBold\"><color=#FFE433>Take</color></font>";
+                                    action.Name = "<font=\"BenderBold\"><color=#FFE433>Взять</color></font>";
                                 }
                                 else
                                 {
-                                    action.Name = "<font=\"BenderBold\"><color=#" + ColorUtility.ToHtmlStringRGB(MoreCheckmarksMod.needMoreColor) + ">Take</color></font>";
+                                    action.Name = "<font=\"BenderBold\"><color=#" + ColorUtility.ToHtmlStringRGB(MoreCheckmarksMod.needMoreColor) + ">Взять</color></font>";
                                 }
                             }
                         }
@@ -1417,11 +1444,11 @@ namespace MoreCheckmarks
                             {
                                 if (questItem && MoreCheckmarksMod.questPriority > MoreCheckmarksMod.wishlistPriority)
                                 {
-                                    action.Name = "<font=\"BenderBold\"><color=#FFE433>Take</color></font>";
+                                    action.Name = "<font=\"BenderBold\"><color=#FFE433>Взять</color></font>";
                                 }
                                 else
                                 {
-                                    action.Name = "<font=\"BenderBold\"><color=#" + ColorUtility.ToHtmlStringRGB(MoreCheckmarksMod.wishlistColor) + ">Take</color></font>";
+                                    action.Name = "<font=\"BenderBold\"><color=#" + ColorUtility.ToHtmlStringRGB(MoreCheckmarksMod.wishlistColor) + ">Взять</color></font>";
                                 }
                             }
                             else
@@ -1430,11 +1457,11 @@ namespace MoreCheckmarks
                                 {
                                     if (questItem && MoreCheckmarksMod.questPriority > MoreCheckmarksMod.hideoutPriority)
                                     {
-                                        action.Name = "<font=\"BenderBold\"><color=#FFE433>Take</color></font>";
+                                        action.Name = "<font=\"BenderBold\"><color=#FFE433>Взять</color></font>";
                                     }
                                     else
                                     {
-                                        action.Name = "<font=\"BenderBold\"><color=#" + ColorUtility.ToHtmlStringRGB(MoreCheckmarksMod.fulfilledColor) + ">Take</color></font>";
+                                        action.Name = "<font=\"BenderBold\"><color=#" + ColorUtility.ToHtmlStringRGB(MoreCheckmarksMod.fulfilledColor) + ">Взять</color></font>";
                                     }
                                 }
                                 else // We only want blue checkmark when ALL requiring this item can be upgraded (if all other requirements are fulfilled too but thats implied)
@@ -1444,22 +1471,22 @@ namespace MoreCheckmarks
                                     {
                                         if (questItem && MoreCheckmarksMod.questPriority > MoreCheckmarksMod.hideoutPriority)
                                         {
-                                            action.Name = "<font=\"BenderBold\"><color=#FFE433>Take</color></font>";
+                                            action.Name = "<font=\"BenderBold\"><color=#FFE433>Взять</color></font>";
                                         }
                                         else
                                         {
-                                            action.Name = "<font=\"BenderBold\"><color=#" + ColorUtility.ToHtmlStringRGB(MoreCheckmarksMod.fulfilledColor) + ">Take</color></font>";
+                                            action.Name = "<font=\"BenderBold\"><color=#" + ColorUtility.ToHtmlStringRGB(MoreCheckmarksMod.fulfilledColor) + ">Взять</color></font>";
                                         }
                                     }
                                     else // Still need more
                                     {
                                         if (questItem && MoreCheckmarksMod.questPriority > MoreCheckmarksMod.hideoutPriority)
                                         {
-                                            action.Name = "<font=\"BenderBold\"><color=#FFE433>Take</color></font>";
+                                            action.Name = "<font=\"BenderBold\"><color=#FFE433>Взять</color></font>";
                                         }
                                         else
                                         {
-                                            action.Name = "<font=\"BenderBold\"><color=#" + ColorUtility.ToHtmlStringRGB(MoreCheckmarksMod.needMoreColor) + ">Take</color></font>";
+                                            action.Name = "<font=\"BenderBold\"><color=#" + ColorUtility.ToHtmlStringRGB(MoreCheckmarksMod.needMoreColor) + ">Взять</color></font>";
                                         }
                                     }
                                 }
@@ -1469,16 +1496,16 @@ namespace MoreCheckmarks
                         {
                             if (questItem && MoreCheckmarksMod.questPriority > MoreCheckmarksMod.wishlistPriority)
                             {
-                                action.Name = "<font=\"BenderBold\"><color=#FFE433>Take</color></font>";
+                                action.Name = "<font=\"BenderBold\"><color=#FFE433>Взять</color></font>";
                             }
                             else
                             {
-                                action.Name = "<font=\"BenderBold\"><color=#" + ColorUtility.ToHtmlStringRGB(MoreCheckmarksMod.wishlistColor) + ">Take</color></font>";
+                                action.Name = "<font=\"BenderBold\"><color=#" + ColorUtility.ToHtmlStringRGB(MoreCheckmarksMod.wishlistColor) + ">Взять</color></font>";
                             }
                         }
                         else if (questItem) // We don't want to color it for anything but it is a quest item
                         {
-                            action.Name = "<font=\"BenderBold\"><color=#FFE433>Take</color></font>";
+                            action.Name = "<font=\"BenderBold\"><color=#FFE433>Взять</color></font>";
                         }
                         //else leave it as it is
 
